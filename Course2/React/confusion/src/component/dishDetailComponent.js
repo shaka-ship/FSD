@@ -1,6 +1,109 @@
-import React from 'react';
-import {Card,CardImg,CardBody,CardTitle,CardText, BreadcrumbItem, Breadcrumb} from 'reactstrap';
+import React, {Component} from 'react';
+import {Card,CardImg,CardBody,CardTitle,CardText, BreadcrumbItem, Breadcrumb,
+    Button, Modal, ModalHeader, ModalBody, Label, Row, Col} from 'reactstrap';
 import {Link} from 'react-router-dom';
+import { Control, LocalForm, Errors } from 'react-redux-form';
+//import CommentForm from './CommentFormComponent';
+
+const required = (val) => val && val.length;
+const maxLength = (len) => (val) => !(val) || (val.length <= len);
+const minLength = (len) => (val) => !(val) || (val.length >= len);
+
+class CommentForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isModalOpen: false
+        }
+        this.toggleModal = this.toggleModal.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    toggleModal() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        });
+      }
+      handleSubmit(values) {
+        console.log('Current State is: ' + JSON.stringify(values));
+        alert('Current State is: ' + JSON.stringify(values));
+        //values.preventDefault();
+    }
+    render() {
+        return (
+            <div>
+                <Button outline onClick={this.toggleModal}>
+                    <span className='fa fa-pencil fa-lg'></span>Submit Comment
+                </Button>
+                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                    <ModalHeader toggle={this.toggleModal}>Make a Comment</ModalHeader>
+                    <ModalBody>
+                        <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
+                            <Row className="form-group">
+                                <Label htmlFor='rating' md='2'>Rating</Label>
+                                <Col >
+                                    <Control.select model=".rating" name="rating"
+                                        className="form-control">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </Control.select>
+                                    <Errors    
+                                        className='text-danger'
+                                        model='.rating'
+                                        show='touched'
+                                        messages={{
+                                            required: 'Required',
+                                        }} 
+                                        />
+                                </Col>
+                            </Row>
+                            <Row className="form-group">
+                                <Label htmlFor="author" md='2'>Author</Label>
+                                <Col>
+                                    <Control.text model=".author" id="author" name="author"
+                                        placeholder="Author"
+                                        className="form-control"
+                                        validators = {{
+                                            required, minLength: minLength(3), maxLength: maxLength(15) 
+                                        }}
+                                         />
+                                    <Errors    
+                                        className='text-danger'
+                                        model='.author'
+                                        show='touched'
+                                        messages={{
+                                            required: 'Required',
+                                            minLength: 'Must be greater than two characters',
+                                            maxLength: 'Must be less than 15 characters'
+                                        }} 
+                                        />
+                                </Col>
+                            </Row>
+                            <Row className="form-group">
+                                <Label htmlFor="message" md='2'>Your Feedback</Label>
+                                <Col>
+                                    <Control.textarea model=".message" id="message" name="message"
+                                        rows="6"
+                                        className="form-control" />
+                                </Col>
+                            </Row>
+                            <Row className="form-group">
+                                <Col md={{size:10, offset: 2}}>
+                                    <Button type="submit" color="primary">
+                                    Comment
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </LocalForm>
+                    </ModalBody>
+                </Modal>
+            </div>
+        );
+    }
+}
+
     function RenderComments({comments}) {
         if(comments ===null) {
             return (
@@ -21,6 +124,7 @@ import {Link} from 'react-router-dom';
                             );
                         })}
                     </ul>
+                    <CommentForm />
                 </div>
             );
         }
