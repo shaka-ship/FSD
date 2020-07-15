@@ -3,7 +3,6 @@ import {Card,CardImg,CardBody,CardTitle,CardText, BreadcrumbItem, Breadcrumb,
     Button, Modal, ModalHeader, ModalBody, Label, Row, Col} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
-//import CommentForm from './CommentFormComponent';
 
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -24,13 +23,13 @@ class CommentForm extends Component {
         });
       }
       handleSubmit(values) {
-        console.log('Current State is: ' + JSON.stringify(values));
-        alert('Current State is: ' + JSON.stringify(values));
-        //values.preventDefault();
+        this.toggleModal();
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
     }
     render() {
         return (
             <div>
+                
                 <Button outline onClick={this.toggleModal}>
                     <span className='fa fa-pencil fa-lg'></span>Submit Comment
                 </Button>
@@ -82,9 +81,9 @@ class CommentForm extends Component {
                                 </Col>
                             </Row>
                             <Row className="form-group">
-                                <Label htmlFor="message" md='2'>Your Feedback</Label>
+                                <Label htmlFor="comment" md='2'>Your Feedback</Label>
                                 <Col>
-                                    <Control.textarea model=".message" id="message" name="message"
+                                    <Control.textarea model=".comment" id="comment" name="comment"
                                         rows="6"
                                         className="form-control" />
                                 </Col>
@@ -104,7 +103,7 @@ class CommentForm extends Component {
     }
 }
 
-    function RenderComments({comments}) {
+    function RenderComments({comments, addComment, dishId}) {
         if(comments ===null) {
             return (
                 <div></div>
@@ -124,7 +123,7 @@ class CommentForm extends Component {
                             );
                         })}
                     </ul>
-                    <CommentForm />
+                    <CommentForm dishId={dishId} addComment={addComment}/>
                 </div>
             );
         }
@@ -166,7 +165,9 @@ class CommentForm extends Component {
                         </div>
                     <div className='row'>
                         <RenderDish dish={props.dish} />
-                        <RenderComments comments={props.comments} />
+                        <RenderComments comments={props.comments}
+                            addComment = {props.addComment}
+                            dishId = {props.dish.id}/>
                     </div>
                 </div>
             );
